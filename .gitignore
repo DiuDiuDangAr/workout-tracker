@@ -1,0 +1,5 @@
+# Cloudflare Workers
+worker/.wrangler/
+
+# 如果你未來可能在根目錄或其他地方也用到，可以直接忽略所有這類資料夾：
+.wrangler/

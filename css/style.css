@@ -129,6 +129,23 @@ body {
   cursor: pointer;
 }
 
+.btn-danger-outline {
+  background: none;
+  border: 1px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 12px 24px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+.action-buttons {
+  margin-top: 20px;
+}
+
 /* Header */
 .app-header {
   display: flex;
@@ -191,21 +208,34 @@ body {
 }
 
 /* Record Tab */
+.record-header-wrapper {
+  margin-bottom: 20px;
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
 .record-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 8px;
 }
 
-.record-header h2 {
-  font-size: 1.2rem;
+.date-picker-input {
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
 }
 
-.date-display {
+.date-display-large {
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--accent);
-  font-size: 0.85rem;
-  font-weight: 600;
 }
 
 /* Muscle Chips */
@@ -271,6 +301,7 @@ body {
   border: 1px solid var(--border);
   border-radius: var(--radius);
   padding: 14px;
+  cursor: pointer;
 }
 
 .exercise-card-header {
@@ -292,6 +323,7 @@ body {
   font-size: 1.2rem;
   cursor: pointer;
   padding: 4px;
+  z-index: 10;
 }
 
 .exercise-card-sets {
@@ -336,7 +368,6 @@ body {
 /* Save */
 .btn-save {
   width: 100%;
-  margin-top: 8px;
 }
 
 .save-status {
@@ -352,6 +383,71 @@ body {
 
 .save-status.error {
   color: var(--danger);
+}
+
+/* Check-in Tab */
+.checkin-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 30px;
+  text-align: center;
+}
+
+.checkin-timer {
+  font-size: 3.5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  margin: 30px 0 10px 0;
+}
+
+.checkin-status {
+  color: var(--text-secondary);
+  margin-bottom: 40px;
+  font-size: 1rem;
+}
+
+.checkin-controls {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.btn-checkin {
+  padding: 18px;
+  border-radius: var(--radius);
+  font-size: 1.1rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-checkin.btn-start {
+  background: var(--success);
+  color: white;
+}
+
+.btn-checkin.btn-end {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-checkin:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.checkin-info {
+  margin-top: 40px;
+  padding: 20px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.6;
 }
 
 /* Timer */
@@ -472,7 +568,36 @@ body {
 
 /* Dashboard */
 .dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg-card);
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+.btn-month-nav {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+#current-month-display {
+  font-size: 0.9rem;
+  font-weight: 600;
+  min-width: 80px;
+  text-align: center;
 }
 
 .stats-cards {
@@ -708,17 +833,6 @@ body {
   font-size: 0.65rem;
   color: var(--accent);
   margin-bottom: 4px;
-}
-
-/* Line Chart */
-.line-chart {
-  position: relative;
-  height: 120px;
-}
-
-.line-chart svg {
-  width: 100%;
-  height: 100%;
 }
 
 /* Distribution */
@@ -961,31 +1075,10 @@ body {
   margin: 2px 4px 2px 0;
 }
 
-/* Timer Sound Toggle */
-.timer-sound-toggle {
-  margin-bottom: 20px;
-}
-
-.toggle-label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: var(--text-secondary);
-}
-
-.toggle-label input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: var(--accent);
-}
-
 /* Drag and Drop */
 .exercise-card {
   position: relative;
   transition: transform 0.2s, box-shadow 0.2s;
-  touch-action: none;
 }
 
 .exercise-card.dragging {
@@ -1046,16 +1139,4 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--border);
   border-radius: 2px;
-}
-
-/* Vibrate animation for timer */
-@keyframes vibrate {
-  0%, 100% { transform: translateX(0); }
-  25% { transform: translateX(-2px); }
-  75% { transform: translateX(2px); }
-}
-
-.timer-done {
-  animation: vibrate 0.1s linear infinite;
-  color: var(--danger) !important;
 }

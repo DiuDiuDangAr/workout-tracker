@@ -35,6 +35,7 @@
       <!-- Tab Navigation -->
       <nav class="tab-nav">
         <button class="tab-btn active" data-tab="record">紀錄</button>
+        <button class="tab-btn" data-tab="checkin">打卡</button>
         <button class="tab-btn" data-tab="timer">計時</button>
         <button class="tab-btn" data-tab="dashboard">總覽</button>
         <button class="tab-btn" data-tab="analysis">分析</button>
@@ -42,13 +43,16 @@
 
       <!-- Record Tab -->
       <div id="tab-record" class="tab-content active">
-        <div class="record-header">
-          <h2>今日訓練</h2>
-          <span id="today-date" class="date-display"></span>
+        <div class="record-header-wrapper">
+          <div class="record-header">
+            <h2>訓練錄入</h2>
+            <input type="date" id="record-date-picker" class="date-picker-input">
+          </div>
+          <div id="today-date-display" class="date-display-large"></div>
         </div>
 
         <div class="muscle-group-selector">
-          <h3>訓練部位</h3>
+          <h3>訓練部位 (單選)</h3>
           <div class="muscle-chips">
             <button class="chip" data-muscle="chest">胸</button>
             <button class="chip" data-muscle="back">背</button>
@@ -74,8 +78,29 @@
           <input type="number" id="duration-input" min="0" max="300" placeholder="60">
         </div>
 
-        <button id="save-workout-btn" class="btn-primary btn-save">儲存今日訓練</button>
+        <div class="action-buttons">
+          <button id="save-workout-btn" class="btn-primary btn-save">儲存訓練紀錄</button>
+          <button id="delete-workout-btn" class="btn-danger-outline">刪除此日紀錄</button>
+        </div>
         <div id="save-status" class="save-status"></div>
+      </div>
+
+      <!-- Check-in Tab -->
+      <div id="tab-checkin" class="tab-content">
+        <div class="checkin-container">
+          <h2>訓練計時</h2>
+          <div class="checkin-timer" id="checkin-timer-display">00:00:00</div>
+          <div class="checkin-status" id="checkin-status">尚未開始</div>
+          
+          <div class="checkin-controls">
+            <button id="checkin-start" class="btn-checkin btn-start">開始訓練打卡</button>
+            <button id="checkin-end" class="btn-checkin btn-end" disabled>結束訓練並記錄</button>
+          </div>
+
+          <div class="checkin-info">
+            <p>點擊「開始」將啟動實時計時，結束後時間會自動填入錄入頁面的訓練時長中。</p>
+          </div>
+        </div>
       </div>
 
       <!-- Timer Tab -->
@@ -114,6 +139,11 @@
       <div id="tab-dashboard" class="tab-content">
         <div class="dashboard-header">
           <h2>訓練總覽</h2>
+          <div class="month-selector">
+            <button id="prev-month" class="btn-month-nav">&lt;</button>
+            <span id="current-month-display">2024年3月</span>
+            <button id="next-month" class="btn-month-nav">&gt;</button>
+          </div>
         </div>
 
         <div class="stats-cards">
@@ -137,7 +167,7 @@
         </div>
 
         <div class="month-overview">
-          <h3>本月紀錄</h3>
+          <h3>月份紀錄</h3>
           <div id="month-grid" class="month-grid"></div>
         </div>
 
@@ -166,9 +196,9 @@
             <option value="cardio">有氧</option>
           </select>
           <select id="analysis-period">
-            <option value="4weeks">近4週</option>
-            <option value="8weeks">近8週</option>
-            <option value="12weeks">近12週</option>
+            <option value="4">近4週</option>
+            <option value="8">近8週</option>
+            <option value="12">近12週</option>
           </select>
         </div>
 
@@ -178,7 +208,7 @@
         </div>
 
         <div class="analysis-section">
-          <h3>重量進步</h3>
+          <h3>重量進步 (lbs)</h3>
           <div id="weight-chart" class="chart-container"></div>
         </div>
 
@@ -188,7 +218,7 @@
         </div>
 
         <div class="analysis-section">
-          <h3>訓練量 (Volume)</h3>
+          <h3>訓練量 (Volume - lbs)</h3>
           <div id="volume-chart" class="chart-container"></div>
         </div>
 
@@ -204,7 +234,7 @@
   <div id="exercise-modal" class="modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>新增動作</h3>
+        <h3 id="modal-title">新增動作</h3>
         <button class="modal-close" id="modal-close">&times;</button>
       </div>
       <form id="exercise-form">
@@ -217,11 +247,11 @@
         </div>
         <div id="last-record" class="last-record"></div>
         <div class="sets-container">
-          <label>組數紀錄</label>
+          <label>組數紀錄 (lbs)</label>
           <div id="sets-list" class="sets-list">
             <div class="set-row">
               <span class="set-num">1</span>
-              <input type="number" placeholder="重量(kg)" class="set-weight" step="0.5">
+              <input type="number" placeholder="重量(lbs)" class="set-weight" step="0.5">
               <input type="number" placeholder="次數" class="set-reps">
             </div>
           </div>
