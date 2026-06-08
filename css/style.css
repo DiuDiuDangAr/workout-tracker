@@ -523,6 +523,24 @@ body {
   color: #000;
 }
 
+/* Timer Specific Colors and Animations */
+.timer-display.active {
+  color: #00f7ff; /* Cyan for active countdown */
+  text-shadow: 0 0 20px rgba(0, 247, 255, 0.4);
+}
+
+.btn-start.paused-blink {
+  background: #ff0055; /* Hot pink/red for prominence */
+  color: white;
+  animation: pulse-blink 1s infinite;
+}
+
+@keyframes pulse-blink {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 .btn-pause {
   background: var(--bg-card);
   color: var(--text-primary);

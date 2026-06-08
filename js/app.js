@@ -13,7 +13,7 @@ let state = {
   currentRecordDate: getDateStr(new Date()),
   selectedMuscles: [],
   currentExercises: [],
-  editingExerciseIndex: null, // null means adding new
+  editingExerciseIndex: null,
 
   // Dashboard Tab State
   dashboardDate: new Date(),
@@ -23,7 +23,6 @@ let state = {
   timerSeconds: 90,
   timerRemaining: 90,
   timerRunning: false,
-  draggedIndex: null,
 
   // Check-in State
   checkinStartTime: localStorage.getItem('checkinStartTime') ? parseInt(localStorage.getItem('checkinStartTime')) : null,
@@ -212,7 +211,6 @@ function updateDateDisplay() {
 
 function selectMuscle(chip) {
   const muscle = chip.dataset.muscle;
-  // Feature 1: Toggle single selection
   if (state.selectedMuscles.includes(muscle)) {
     state.selectedMuscles = [];
   } else {
@@ -248,7 +246,6 @@ function renderExercisesList() {
 }
 
 function removeExercise(index) {
-  // Feature 4: Correct deletion of added exercises
   if (confirm('確定要刪除此動作嗎？')) {
     state.currentExercises.splice(index, 1);
     renderExercisesList();
@@ -256,7 +253,6 @@ function removeExercise(index) {
 }
 
 function editExercise(index) {
-  // Feature 2: Allow editing of existing exercises
   state.editingExerciseIndex = index;
   const ex = state.currentExercises[index];
   openExerciseModal(ex);
@@ -296,16 +292,7 @@ async function saveWorkout() {
 
 async function deleteDayWorkout() {
   if (!confirm(`確定要刪除 ${state.currentRecordDate} 的所有紀錄嗎？此動作無法復原。`)) return;
-
-  const workout = state.workouts.find(w => w.date === state.currentRecordDate);
-  if (!workout) {
-    loadWorkoutForDate(state.currentRecordDate);
-    return;
-  }
-
   try {
-    // Currently, the API saves by date. To delete, we send an empty workout or implement a DELETE.
-    // Assuming POSTing an empty exercises/muscles set signifies clearing for this app's logic.
     await apiCall('POST', '/api/workouts', {
       date: state.currentRecordDate,
       muscles: [],
@@ -428,19 +415,26 @@ function endCheckin() {
   clearInterval(state.checkinInterval);
   const elapsedMinutes = Math.round((Date.now() - state.checkinStartTime) / 60000);
   
-  // Set duration to record tab
-  document.getElementById('duration-input').value = elapsedMinutes;
+  const durationInput = document.getElementById('duration-input');
+  durationInput.value = elapsedMinutes;
   
-  // Cleanup
+  durationInput.style.borderColor = 'var(--success)';
+  durationInput.style.boxShadow = '0 0 15px var(--success)';
+  durationInput.style.transition = 'all 0.3s ease';
+  
   state.checkinStartTime = null;
   localStorage.removeItem('checkinStartTime');
   document.getElementById('checkin-start').disabled = false;
   document.getElementById('checkin-end').disabled = true;
-  document.getElementById('checkin-status').textContent = '訓練已結束，時長已填入紀錄頁。';
+  document.getElementById('checkin-status').textContent = `訓練已結束，時長 (${elapsedMinutes} 分) 已填入紀錄頁。`;
   document.getElementById('checkin-timer-display').textContent = '00:00:00';
   
-  // Switch to record tab
   switchTab('record');
+
+  setTimeout(() => {
+    durationInput.style.borderColor = '';
+    durationInput.style.boxShadow = '';
+  }, 2000);
 }
 
 // --- Dashboard Logic ---
@@ -455,11 +449,9 @@ function renderDashboard() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
   const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
-  // Month Display
   document.getElementById('current-month-display').textContent = 
     `${now.getFullYear()}年${now.getMonth() + 1}月`;
 
-  // Stats (Using current actual time for streak, but dashboard date for counts)
   const actualNow = new Date();
   const weekStart = getWeekStart(actualNow);
   
@@ -480,7 +472,7 @@ function renderDashboard() {
 
 function renderWeekDays(now) {
   const container = document.getElementById('week-days');
-  const dayLabels = ['一', '二', '三', '四', '五', '六', '日'];
+  const dayLabels = ['日', '一', '二', '三', '四', '五', '六'];
   const weekStart = getWeekStart(now);
 
   let html = '';
@@ -506,7 +498,7 @@ function renderMonthGrid(date) {
   const month = date.getMonth();
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  let startOffset = (firstDay.getDay() + 6) % 7;
+  let startOffset = firstDay.getDay();
 
   let html = '';
   for (let i = 0; i < startOffset; i++) {
@@ -557,7 +549,6 @@ function handleAutocomplete() {
 
 function showLastRecord(exerciseName) {
   const container = document.getElementById('last-record');
-  
   let lastRecord = null;
   const sorted = [...state.workouts].sort((a, b) => b.date.localeCompare(a.date));
   for (const w of sorted) {
@@ -602,9 +593,8 @@ function getDateStr(date) {
 
 function getWeekStart(date) {
   const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
+  const day = d.getDay(); 
+  d.setDate(d.getDate() - day);
   d.setHours(0, 0, 0, 0);
   return d;
 }
@@ -637,13 +627,11 @@ function calculateStreak() {
   return streak;
 }
 
-// --- Timer & Analysis placeholders (Required for full logic) ---
-// Note: Timer and Analysis logic remains similar to previous version but updated for lbs
+// --- Timer & Analysis Logic ---
 
 function playTimerSound() {
   const soundEnabled = document.getElementById('timer-sound').checked;
   if (!soundEnabled) return;
-  // Use simple Audio API as in previous version
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   [0, 150, 300].forEach((delay, i) => {
     setTimeout(() => {
@@ -673,6 +661,8 @@ function startTimer() {
   if (state.timerRunning) return;
   state.timerRunning = true;
   document.getElementById('timer-start').disabled = true;
+  document.getElementById('timer-start').classList.remove('paused-blink');
+  document.getElementById('timer-display').classList.add('active');
   document.getElementById('timer-pause').disabled = false;
   state.timerInterval = setInterval(() => {
     state.timerRemaining--;
@@ -682,6 +672,7 @@ function startTimer() {
       clearInterval(state.timerInterval);
       state.timerRunning = false;
       document.getElementById('timer-start').disabled = false;
+      document.getElementById('timer-display').classList.remove('active');
       document.getElementById('timer-pause').disabled = true;
       playTimerSound();
     }
@@ -692,11 +683,14 @@ function pauseTimer() {
   clearInterval(state.timerInterval);
   state.timerRunning = false;
   document.getElementById('timer-start').disabled = false;
+  document.getElementById('timer-start').classList.add('paused-blink');
+  document.getElementById('timer-display').classList.remove('active');
   document.getElementById('timer-pause').disabled = true;
 }
 
 function resetTimer() {
   pauseTimer();
+  document.getElementById('timer-start').classList.remove('paused-blink');
   state.timerRemaining = state.timerSeconds;
   updateTimerDisplay();
   updateProgressRing();
@@ -773,14 +767,14 @@ function renderWeightChart(workouts) {
     return;
   }
   container.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">
-    ${entries.map(([name, points]) => {
+    \${entries.map(([name, points]) => {
       const last = points[points.length - 1].w;
       const first = points[0].w;
       const diff = last - first;
-      return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span>${name}</span>
-        <span style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${last} lbs (${diff >= 0 ? '+' : ''}${diff})</span>
-      </div>`;
+      return \`<div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span>\${name}</span>
+        <span style="color:\${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">\${last} lbs (\${diff >= 0 ? '+' : ''}\${diff})</span>
+      </div>\`;
     }).join('')}
   </div>`;
 }
@@ -793,12 +787,12 @@ function renderDurationChart(workouts) {
     return;
   }
   const max = Math.max(...sorted.map(w => w.duration), 1);
-  container.innerHTML = `<div class="bar-chart">${sorted.map(w => `
+  container.innerHTML = `<div class="bar-chart">\${sorted.map(w => \`
     <div class="bar-wrapper">
-      <span class="bar-value">${w.duration}m</span>
-      <div class="bar" style="height: ${(w.duration/max)*100}%"></div>
-      <span class="bar-label">${w.date.slice(5)}</span>
-    </div>`).join('')}</div>`;
+      <span class="bar-value">\${w.duration}m</span>
+      <div class="bar" style="height: \${(w.duration/max)*100}%"></div>
+      <span class="bar-label">\${w.date.slice(5)}</span>
+    </div>\`).join('')}</div>`;
 }
 
 function renderVolumeChart(workouts, weeks) {
@@ -817,12 +811,12 @@ function renderVolumeChart(workouts, weeks) {
   });
   const entries = Object.entries(weeklyVol).sort((a, b) => a[0].localeCompare(b[0]));
   const max = Math.max(...entries.map(e => e[1]), 1);
-  container.innerHTML = `<div class="bar-chart">${entries.map(([k, v]) => `
+  container.innerHTML = `<div class="bar-chart">\${entries.map(([k, v]) => \`
     <div class="bar-wrapper">
-      <span class="bar-value">${v > 1000 ? (v/1000).toFixed(1)+'k' : v}</span>
-      <div class="bar" style="height: ${(v/max)*100}%"></div>
-      <span class="bar-label">${k.slice(5)}</span>
-    </div>`).join('')}</div>`;
+      <span class="bar-value">\${v > 1000 ? (v/1000).toFixed(1)+'k' : v}</span>
+      <div class="bar" style="height: \${(v/max)*100}%"></div>
+      <span class="bar-label">\${k.slice(5)}</span>
+    </div>\`).join('')}</div>`;
 }
 
 function renderDistributionChart(weeks) {
@@ -835,12 +829,12 @@ function renderDistributionChart(weeks) {
   });
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   const max = Math.max(...Object.values(counts), 1);
-  container.innerHTML = `<div class="distribution-chart">${sorted.map(([m, c]) => `
+  container.innerHTML = `<div class="distribution-chart">\${sorted.map(([m, c]) => \`
     <div class="dist-row">
-      <span class="dist-label">${MUSCLE_LABELS[m]}</span>
-      <div class="dist-bar-bg"><div class="dist-bar-fill" style="width: ${(c/max)*100}%"></div></div>
-      <span class="dist-value">${c}</span>
-    </div>`).join('')}</div>`;
+      <span class="dist-label">\${MUSCLE_LABELS[m]}</span>
+      <div class="dist-bar-bg"><div class="dist-bar-fill" style="width: \${(c/max)*100}%"></div></div>
+      <span class="dist-value">\${c}</span>
+    </div>\`).join('')}</div>`;
 }
 
 function handleAutocompleteKeydown(e) {

@@ -1,4 +1,4 @@
-# 鐵人日誌 — Workout Tracker
+# 懶惰鬼訓練日誌 — Workout Tracker
 
 深色系重訓追蹤 Web App，專為手機使用設計。前端靜態託管於 GitHub Pages，後端 API 運行在 Cloudflare Worker，資料透過 GitHub API 儲存於 repo 中的 JSON 檔案。
 
