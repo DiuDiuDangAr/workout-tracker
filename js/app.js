@@ -1,4 +1,4 @@
-const API_BASE = 'https://workout-tracker.YOUR_SUBDOMAIN.workers.dev';
+const API_BASE = 'https://workout-tracker.welly180.workers.dev';
 
 const MUSCLE_LABELS = {
   chest: '胸', back: '背', shoulders: '肩', biceps: '二頭',
