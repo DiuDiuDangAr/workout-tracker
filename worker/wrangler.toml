@@ -1,0 +1,13 @@
+name = "workout-tracker"
+main = "worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+DATA_PATH = "data/workouts.json"
+DATA_BRANCH = "main"
+# Set these as secrets via: wrangler secret put <NAME>
+# USERNAME
+# PASSWORD
+# JWT_SECRET
+# GITHUB_TOKEN
+# GITHUB_REPO

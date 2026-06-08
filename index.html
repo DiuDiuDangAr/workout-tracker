@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>鐵人日誌</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a1a2e">
+</head>
+<body>
+  <div id="app">
+    <!-- Login Screen -->
+    <div id="login-screen" class="screen active">
+      <div class="login-container">
+        <h1 class="logo">鐵人日誌</h1>
+        <p class="tagline">記錄每一次突破</p>
+        <form id="login-form">
+          <input type="text" id="login-username" placeholder="帳號" required>
+          <input type="password" id="login-password" placeholder="密碼" required>
+          <button type="submit" class="btn-primary">登入</button>
+        </form>
+        <p id="login-error" class="error-msg"></p>
+      </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="main-app" class="screen">
+      <!-- Header -->
+      <header class="app-header">
+        <h1 class="app-title">鐵人日誌</h1>
+        <button id="logout-btn" class="btn-icon" title="登出">⏻</button>
+      </header>
+
+      <!-- Tab Navigation -->
+      <nav class="tab-nav">
+        <button class="tab-btn active" data-tab="record">紀錄</button>
+        <button class="tab-btn" data-tab="timer">計時</button>
+        <button class="tab-btn" data-tab="dashboard">總覽</button>
+        <button class="tab-btn" data-tab="analysis">分析</button>
+      </nav>
+
+      <!-- Record Tab -->
+      <div id="tab-record" class="tab-content active">
+        <div class="record-header">
+          <h2>今日訓練</h2>
+          <span id="today-date" class="date-display"></span>
+        </div>
+
+        <div class="muscle-group-selector">
+          <h3>訓練部位</h3>
+          <div class="muscle-chips">
+            <button class="chip" data-muscle="chest">胸</button>
+            <button class="chip" data-muscle="back">背</button>
+            <button class="chip" data-muscle="shoulders">肩</button>
+            <button class="chip" data-muscle="biceps">二頭</button>
+            <button class="chip" data-muscle="triceps">三頭</button>
+            <button class="chip" data-muscle="legs">腿</button>
+            <button class="chip" data-muscle="core">核心</button>
+            <button class="chip" data-muscle="cardio">有氧</button>
+          </div>
+        </div>
+
+        <div id="exercises-section" class="exercises-section">
+          <div class="section-header">
+            <h3>訓練動作</h3>
+            <button id="add-exercise-btn" class="btn-add">+ 新增動作</button>
+          </div>
+          <div id="exercises-list" class="exercises-list"></div>
+        </div>
+
+        <div class="duration-section">
+          <h3>訓練時長（分鐘）</h3>
+          <input type="number" id="duration-input" min="0" max="300" placeholder="60">
+        </div>
+
+        <button id="save-workout-btn" class="btn-primary btn-save">儲存今日訓練</button>
+        <div id="save-status" class="save-status"></div>
+      </div>
+
+      <!-- Timer Tab -->
+      <div id="tab-timer" class="tab-content">
+        <div class="timer-container">
+          <h2>組間休息</h2>
+          <div class="timer-display" id="timer-display">01:30</div>
+          <div class="timer-presets">
+            <button class="preset-btn" data-seconds="30">30s</button>
+            <button class="preset-btn" data-seconds="60">1:00</button>
+            <button class="preset-btn active" data-seconds="90">1:30</button>
+            <button class="preset-btn" data-seconds="120">2:00</button>
+            <button class="preset-btn" data-seconds="180">3:00</button>
+          </div>
+          <div class="timer-sound-toggle">
+            <label class="toggle-label">
+              <input type="checkbox" id="timer-sound" checked>
+              <span class="toggle-text">音效提醒</span>
+            </label>
+          </div>
+          <div class="timer-controls">
+            <button id="timer-start" class="btn-timer btn-start">開始</button>
+            <button id="timer-pause" class="btn-timer btn-pause" disabled>暫停</button>
+            <button id="timer-reset" class="btn-timer btn-reset">重設</button>
+          </div>
+          <div class="timer-progress">
+            <svg viewBox="0 0 200 200" class="progress-ring">
+              <circle class="progress-ring-bg" cx="100" cy="100" r="90"/>
+              <circle class="progress-ring-fill" id="progress-circle" cx="100" cy="100" r="90"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dashboard Tab -->
+      <div id="tab-dashboard" class="tab-content">
+        <div class="dashboard-header">
+          <h2>訓練總覽</h2>
+        </div>
+
+        <div class="stats-cards">
+          <div class="stat-card">
+            <span class="stat-value" id="week-count">0</span>
+            <span class="stat-label">本週訓練</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="month-count">0</span>
+            <span class="stat-label">本月訓練</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-value" id="streak-count">0</span>
+            <span class="stat-label">連續天數</span>
+          </div>
+        </div>
+
+        <div class="week-calendar">
+          <h3>本週紀錄</h3>
+          <div id="week-days" class="week-days"></div>
+        </div>
+
+        <div class="month-overview">
+          <h3>本月紀錄</h3>
+          <div id="month-grid" class="month-grid"></div>
+        </div>
+
+        <div class="recent-workouts">
+          <h3>最近訓練</h3>
+          <div id="recent-list" class="recent-list"></div>
+        </div>
+      </div>
+
+      <!-- Analysis Tab -->
+      <div id="tab-analysis" class="tab-content">
+        <div class="analysis-header">
+          <h2>訓練分析</h2>
+        </div>
+
+        <div class="analysis-filter">
+          <select id="analysis-muscle">
+            <option value="all">全部部位</option>
+            <option value="chest">胸</option>
+            <option value="back">背</option>
+            <option value="shoulders">肩</option>
+            <option value="biceps">二頭</option>
+            <option value="triceps">三頭</option>
+            <option value="legs">腿</option>
+            <option value="core">核心</option>
+            <option value="cardio">有氧</option>
+          </select>
+          <select id="analysis-period">
+            <option value="4weeks">近4週</option>
+            <option value="8weeks">近8週</option>
+            <option value="12weeks">近12週</option>
+          </select>
+        </div>
+
+        <div class="analysis-section">
+          <h3>訓練頻率</h3>
+          <div id="frequency-chart" class="chart-container"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>重量進步</h3>
+          <div id="weight-chart" class="chart-container"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>訓練時長趨勢</h3>
+          <div id="duration-chart" class="chart-container"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>訓練量 (Volume)</h3>
+          <div id="volume-chart" class="chart-container"></div>
+        </div>
+
+        <div class="analysis-section">
+          <h3>部位分佈</h3>
+          <div id="distribution-chart" class="chart-container"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Exercise Modal -->
+  <div id="exercise-modal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>新增動作</h3>
+        <button class="modal-close" id="modal-close">&times;</button>
+      </div>
+      <form id="exercise-form">
+        <div class="form-group">
+          <label>動作名稱</label>
+          <div class="autocomplete-wrapper">
+            <input type="text" id="exercise-name" placeholder="例：臥推" required autocomplete="off">
+            <div id="autocomplete-list" class="autocomplete-list"></div>
+          </div>
+        </div>
+        <div id="last-record" class="last-record"></div>
+        <div class="sets-container">
+          <label>組數紀錄</label>
+          <div id="sets-list" class="sets-list">
+            <div class="set-row">
+              <span class="set-num">1</span>
+              <input type="number" placeholder="重量(kg)" class="set-weight" step="0.5">
+              <input type="number" placeholder="次數" class="set-reps">
+            </div>
+          </div>
+          <button type="button" id="add-set-btn" class="btn-add-set">+ 新增一組</button>
+        </div>
+        <button type="submit" class="btn-primary">確認</button>
+      </form>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
