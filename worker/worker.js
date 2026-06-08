@@ -196,15 +196,15 @@ async function createJWT(secret) {
   const header = b64url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));
   const payload = b64url(JSON.stringify({ iat: Math.floor(Date.now()/1000), exp: Math.floor(Date.now()/1000) + 86400*30 }));
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`\${header}.\${payload}`));
-  return `\${header}.\${payload}.\${b64url(String.fromCharCode(...new Uint8Array(sig)))}`;
+  const sig = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${header}.${payload}`));
+  return `${header}.${payload}.${b64url(String.fromCharCode(...new Uint8Array(sig)))}`;
 }
 
 async function verifyJWT(token, secret) {
   const [h, p, s] = token.split('.');
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']);
   const sig = Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0));
-  const valid = await crypto.subtle.verify('HMAC', key, sig, new TextEncoder().encode(`\${h}.\${p}`));
+  const valid = await crypto.subtle.verify('HMAC', key, sig, new TextEncoder().encode(`${h}.${p}`));
   if (!valid) throw new Error();
   return JSON.parse(atob(p.replace(/-/g, '+').replace(/_/g, '/')));
 }
