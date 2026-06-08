@@ -767,14 +767,14 @@ function renderWeightChart(workouts) {
     return;
   }
   container.innerHTML = `<div style="display:flex;flex-direction:column;gap:10px;">
-    \${entries.map(([name, points]) => {
+    ${entries.map(([name, points]) => {
       const last = points[points.length - 1].w;
       const first = points[0].w;
       const diff = last - first;
-      return \`<div style="display:flex;justify-content:space-between;font-size:0.85rem;">
-        <span>\${name}</span>
-        <span style="color:\${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">\${last} lbs (\${diff >= 0 ? '+' : ''}\${diff})</span>
-      </div>\`;
+      return `<div style="display:flex;justify-content:space-between;font-size:0.85rem;">
+        <span>${name}</span>
+        <span style="color:${diff >= 0 ? 'var(--success)' : 'var(--danger)'}">${last} lbs (${diff >= 0 ? '+' : ''}${diff})</span>
+      </div>`;
     }).join('')}
   </div>`;
 }
@@ -787,12 +787,12 @@ function renderDurationChart(workouts) {
     return;
   }
   const max = Math.max(...sorted.map(w => w.duration), 1);
-  container.innerHTML = `<div class="bar-chart">\${sorted.map(w => \`
+  container.innerHTML = `<div class="bar-chart">${sorted.map(w => `
     <div class="bar-wrapper">
-      <span class="bar-value">\${w.duration}m</span>
-      <div class="bar" style="height: \${(w.duration/max)*100}%"></div>
-      <span class="bar-label">\${w.date.slice(5)}</span>
-    </div>\`).join('')}</div>`;
+      <span class="bar-value">${w.duration}m</span>
+      <div class="bar" style="height: ${(w.duration/max)*100}%"></div>
+      <span class="bar-label">${w.date.slice(5)}</span>
+    </div>`).join('')}</div>`;
 }
 
 function renderVolumeChart(workouts, weeks) {
@@ -811,12 +811,12 @@ function renderVolumeChart(workouts, weeks) {
   });
   const entries = Object.entries(weeklyVol).sort((a, b) => a[0].localeCompare(b[0]));
   const max = Math.max(...entries.map(e => e[1]), 1);
-  container.innerHTML = `<div class="bar-chart">\${entries.map(([k, v]) => \`
+  container.innerHTML = `<div class="bar-chart">${entries.map(([k, v]) => `
     <div class="bar-wrapper">
-      <span class="bar-value">\${v > 1000 ? (v/1000).toFixed(1)+'k' : v}</span>
-      <div class="bar" style="height: \${(v/max)*100}%"></div>
-      <span class="bar-label">\${k.slice(5)}</span>
-    </div>\`).join('')}</div>`;
+      <span class="bar-value">${v > 1000 ? (v/1000).toFixed(1)+'k' : v}</span>
+      <div class="bar" style="height: ${(v/max)*100}%"></div>
+      <span class="bar-label">${k.slice(5)}</span>
+    </div>`).join('')}</div>`;
 }
 
 function renderDistributionChart(weeks) {
@@ -829,12 +829,12 @@ function renderDistributionChart(weeks) {
   });
   const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
   const max = Math.max(...Object.values(counts), 1);
-  container.innerHTML = `<div class="distribution-chart">\${sorted.map(([m, c]) => \`
+  container.innerHTML = `<div class="distribution-chart">${sorted.map(([m, c]) => `
     <div class="dist-row">
-      <span class="dist-label">\${MUSCLE_LABELS[m]}</span>
-      <div class="dist-bar-bg"><div class="dist-bar-fill" style="width: \${(c/max)*100}%"></div></div>
-      <span class="dist-value">\${c}</span>
-    </div>\`).join('')}</div>`;
+      <span class="dist-label">${MUSCLE_LABELS[m]}</span>
+      <div class="dist-bar-bg"><div class="dist-bar-fill" style="width: ${(c/max)*100}%"></div></div>
+      <span class="dist-value">${c}</span>
+    </div>`).join('')}</div>`;
 }
 
 function handleAutocompleteKeydown(e) {
